@@ -38,7 +38,11 @@ public class ReservationService {
         Iterable<Reservation> reservations = this.reservationRepository.findByDate(new java.sql.Date(date.getTime()));
         if(null != reservations){
             reservations.forEach(reservation -> {
-                Guest guest = this.guestRepository.findOne(reservation.getGuestId());
+                Guest guest = new Guest();
+                Optional<Guest> opt = this.guestRepository.findById(reservation.getGuestId());
+                if(opt.isPresent()) {
+                    guest = opt.get();
+                }
                 if(null != guest){
                     RoomReservation roomReservation = roomReservationMap.get(reservation.getId());
                     roomReservation.setDate(date);
@@ -48,6 +52,11 @@ public class ReservationService {
                 }
             });
         }
+//        Optional<Foo> fooOptional = fooRepository.findById(id);
+//        if (fooOptional.isPresent()){
+//            Foo foo = fooOptional.get();
+//            // processing with foo ...
+//        }
         List<RoomReservation> roomReservations = new ArrayList<>();
         for(Long roomId:roomReservationMap.keySet()){
             roomReservations.add(roomReservationMap.get(roomId));
